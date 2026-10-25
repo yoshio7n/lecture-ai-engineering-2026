@@ -24,15 +24,18 @@ from app.config import MODEL, api_error_message, get_api_key
 DEFAULT_QUESTION = "AIE2026の講座の宿題にある「3レベル」とは何ですか？"
 
 
-def ask(chat: Chat, question: str) -> tuple[str, int | None, int | None, float]:
+def ask(
+    chat: Chat, question: str
+) -> tuple[str, str | None, int | None, int | None, float]:
     started_at = time.perf_counter()
     response = chat.send_message(question)
     elapsed_seconds = time.perf_counter() - started_at
     usage = response.usage_metadata
     if usage is None:
-        return response.text, None, None, elapsed_seconds
+        return response.text, response.model_version, None, None, elapsed_seconds
     return (
         response.text,
+        response.model_version,
         usage.prompt_token_count,
         usage.candidates_token_count,
         elapsed_seconds,
@@ -50,13 +53,20 @@ def main() -> None:
         question = args.question
         while question:
             print(f"[質問] {question}")
-            answer, input_tokens, output_tokens, elapsed_seconds = ask(chat, question)
+            (
+                answer,
+                model_version,
+                input_tokens,
+                output_tokens,
+                elapsed_seconds,
+            ) = ask(chat, question)
             print(f"\n[回答] {answer}")
-            print(f"[model] {MODEL}")
             input_count = input_tokens if input_tokens is not None else "不明"
             output_count = output_tokens if output_tokens is not None else "不明"
-            print(f"[トークン数] 入力: {input_count} / 出力: {output_count}")
-            print(f"[応答時間] {elapsed_seconds:.2f} 秒")
+            print(
+                f"{model_version or MODEL} "
+                f"{input_count}/{output_count} {elapsed_seconds:.2f}秒"
+            )
             question = input("\n続けて質問してください（終了するには空行）: ").strip()
     except errors.APIError as e:
         print(api_error_message(e.code, e.message))

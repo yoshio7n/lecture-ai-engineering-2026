@@ -15,6 +15,7 @@ def test_follow_up_questions_share_the_chat_history(monkeypatch, capsys):
                 (),
                 {
                     "text": f"回答: {question}",
+                    "model_version": "gemini-routed-model",
                     "usage_metadata": SimpleNamespace(
                         prompt_token_count=10,
                         candidates_token_count=20,
@@ -46,8 +47,7 @@ def test_follow_up_questions_share_the_chat_history(monkeypatch, capsys):
     output = capsys.readouterr().out
     assert "回答: 最初の質問" in output
     assert "回答: 続けて質問" in output
-    assert output.count("[トークン数] 入力: 10 / 出力: 20") == 2
+    assert output.count("gemini-routed-model 10/20 ") == 2
+    assert "秒" in output
     assert output.index("[質問] 最初の質問") < output.index("[回答] 回答: 最初の質問")
-    assert output.index("[回答] 回答: 最初の質問") < output.index("[model]")
-    assert output.index("[model]") < output.index("[トークン数]")
-    assert output.count("[応答時間]") == 2
+    assert output.index("[回答] 回答: 最初の質問") < output.index("gemini-routed-model")
