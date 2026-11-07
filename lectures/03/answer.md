@@ -15,4 +15,4 @@
 - 取り組んだレベル：基礎
 - やったこと：INSTRUCTIONSからmake_quizの行を消す。
 - 結果：変化なくmake_quizが呼ばれる。
-- 気づき・疑問：INSTRUCTIONSへのtoolの記載は必須ではない。おそらく、モデルがdocstringを読んで判断してる。
+- 気づき・疑問：INSTRUCTIONSへのtoolの記載は必須ではない。モデルがdocstringを読んで判断しているのか？
